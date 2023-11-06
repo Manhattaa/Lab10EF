@@ -1,6 +1,9 @@
 ﻿using Lab10EF.Data;
 using Lab10EF.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lab10EF
 {
@@ -8,7 +11,6 @@ namespace Lab10EF
     {
         static void Main(string[] args)
         {
-            //Creating a very basic menu!
             Console.WriteLine("1. List all customers in the database");
             Console.WriteLine("2. Add a new customer to the database");
 
@@ -18,12 +20,8 @@ namespace Lab10EF
             switch (menuChoice)
             {
                 case "1":
-
-                    // Here we are to create an instance of NorthContext.
-
                     using (var context = new NorthContext())
                     {
-                        // Asks the user if they want the list to be in Ascending or Descending order
                         Console.Clear();
                         Console.WriteLine("List [1]: Ascending or [2]: Descending?");
 
@@ -31,13 +29,11 @@ namespace Lab10EF
 
                         if (userChoice == 1)
                         {
-                            // here we're creating an anonymous object that by default is ordered in Ascending order; the company names are being targeted.
-
                             Console.Clear();
                             var customers = context.Customers
-                            .Include(c => c.Orders)
-                            .OrderBy(c => c.CompanyName)
-                            .ToList();
+                                .Include(c => c.Orders)
+                                .OrderBy(c => c.CompanyName)
+                                .ToList();
 
                             DisplayCustomers(customers);
 
@@ -47,14 +43,13 @@ namespace Lab10EF
                             DisplayAllCustomerInfo(customers, userChoice);
                         }
 
-                        // here we're creating an anonymous object that is ordered in Descending order; the company names are being targeted.
                         if (userChoice == 2)
                         {
                             Console.Clear();
                             var customers = context.Customers
-                            .Include(c => c.Orders)
-                            .OrderByDescending(c => c.CompanyName)
-                            .ToList();
+                                .Include(c => c.Orders)
+                                .OrderByDescending(c => c.CompanyName)
+                                .ToList();
 
                             DisplayCustomers(customers);
 
@@ -65,8 +60,8 @@ namespace Lab10EF
                         }
                     }
                     break;
+
                 case "2":
-                    // Prompt the user to enter customer details
                     Console.Clear();
                     Console.WriteLine("Enter customer details:");
 
@@ -103,12 +98,10 @@ namespace Lab10EF
                     using (NorthContext context = new NorthContext())
                     {
                         int customerCount = context.Customers.Count() + 1;
-                        // Create a new Customer object with the input details
                         var newCustomer = new Customer
                         {
-                            // Use the correct primary key property name
                             CompanyName = companyName,
-                            CustomerId = customerCount.ToString("D4"), //D4 makes it so we get 4 decimals within our primary key. 
+                            CustomerId = customerCount.ToString("D4"),
                             ContactName = contactName,
                             ContactTitle = contactTitle,
                             Address = address,
@@ -120,32 +113,32 @@ namespace Lab10EF
                             Fax = fax
                         };
 
-                        // Add the new customer to the context
                         context.Customers.Add(newCustomer);
-
-                        // Save changes to the database
                         context.SaveChanges();
 
                         Console.WriteLine("New customer added to the database.");
                     }
                     return;
-
-
             }
         }
-        //Listing all customers
+
         static void DisplayCustomers(IEnumerable<Customer> customers)
         {
             for (var i = 0; i < customers.Count(); i++)
             {
-                Console.WriteLine($"{i}. {customers.ElementAt(i).CompanyName}\n\n" +
-                    $"Country / Region: {customers.ElementAt(i).Country}/{customers.ElementAt(i).Region}\n" +
-                    $"Phone Number: {customers.ElementAt(i).Phone}\n" +
-                    $"Amount of Orders: {customers.ElementAt(i).Orders.Count()}");
+                var customer = customers.ElementAt(i);
+                int shippedOrdersCount = customer.Orders.Count(o => o.ShippedDate != null);
+                int pendingOrdersCount = customer.Orders.Count(o => o.ShippedDate == null);
+
+                Console.WriteLine($"{i}. {customer.CompanyName}\n\n" +
+                    $"Country / Region: {customer.Country}/{customer.Region}\n" +
+                    $"Phone Number: {customer.Phone}\n" +
+                    $"Shipped Orders: {shippedOrdersCount}\n" +
+                    $"Pending Orders: {pendingOrdersCount}\n");
                 Console.WriteLine("\n");
             }
         }
-        // Displaying all info in regards of a specific customer
+
         static void DisplayAllCustomerInfo(IEnumerable<Customer> customers, int search)
         {
             bool customerFound = false;
