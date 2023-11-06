@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+// Fady Hatta (.NET23)
 namespace Lab10EF
 {
     internal class Program
