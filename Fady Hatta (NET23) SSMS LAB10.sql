@@ -1,21 +1,22 @@
-SELECT Products.ProductName, Products.UnitPrice, Categories.CategoryName
-FROM Products
-INNER JOIN Categories ON Products.CategoryID = Categories.CategoryID
-ORDER BY Categories.CategoryName, Products.ProductName;
+SELECT c.CompanyName, c.Country, c.Region, c.Phone, COUNT(o.OrderID) AS NumberOfOrders
+FROM Customers AS c
+LEFT JOIN Orders AS o ON c.CustomerID = o.CustomerID
+GROUP BY c.CompanyName, c.Country, c.Region, c.Phone
+ORDER BY c.CompanyName ASC;
 
 
 -- Hämta alla kunder och antal ordrar de gjort. Sortera fallande på antal ordrar.
-SELECT Customers.ContactName, COUNT(Orders.OrderID) AS NumberOfOrders
-FROM Customers
-LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID
-GROUP BY Customers.ContactName
-ORDER BY NumberOfOrders DESC;
+SELECT cu.ContactName, COUNT(o.OrderID) AS TotalOrderValue
+FROM Customers AS cu
+LEFT JOIN Orders AS o ON cu.CustomerID = o.CustomerID
+GROUP BY cu.ContactName
+ORDER BY TotalOrderValue DESC;
 
 -- Hämta alla anställda tillsammans med territorie de har hand om (EmployeeTerritories och Territories tabellerna)
-SELECT Employees.FirstName, Employees.LastName, Territories.TerritoryDescription
-FROM Employees
-INNER JOIN EmployeeTerritories ON Employees.EmployeeID = EmployeeTerritories.EmployeeID
-INNER JOIN Territories ON EmployeeTerritories.TerritoryID = Territories.TerritoryID;
+SELECT e.FirstName, e.LastName, t.TerritoryDescription
+FROM Employees AS e
+INNER JOIN EmployeeTerritories AS et ON e.EmployeeID = et.EmployeeID
+INNER JOIN Territories AS t ON et.TerritoryID = t.TerritoryID;
 
 -- Extra utmaning: I SSMS istället för att skriva antal ordrar, skriv ut summan för deras totala ordervärde
 SELECT c.CustomerID, c.ContactName, SUM(od.Quantity * p.UnitPrice) AS TotalOrderValue
